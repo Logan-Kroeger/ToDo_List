@@ -122,7 +122,7 @@ const Home: React.FC = () => {
 
       <IonList>
         {myArray.map((item, index) => (
-          <IonItem key={index}>
+          <IonItem key={index} style={{ paddingLeft: `${(item.depth-1)*20}px` }}>
             <IonCheckbox slot="start" onClick={() => completeItem()}/>
             <IonLabel>{item.name}</IonLabel>
             <IonButton color='primary' fill='clear' onClick={() => addItem()}>
