@@ -102,8 +102,7 @@ const Home: React.FC = () => {
   // Complete an item from the list
   const completeItem = (event: any, index: number) => {
     const checked  = event.detail.checked;
-    console.log(`${task_array[index].name} is ${checked ? 'complete' : 'not complete'}`);
-
+    
     if (checked){
 
       task_array[index].isCompl = true;
@@ -122,6 +121,42 @@ const Home: React.FC = () => {
       }
 
       // Complete respective parent items
+      let flag = true;
+      // Forward
+      for (let i = index+1; i < task_array.length; i++) {
+        if (task_array[i].depth === current_depth){
+          if (!task_array[i].isCompl){
+            flag = false;
+            break;
+          }
+        }
+        else{
+          break;
+        }
+      }
+
+      //Backward
+      let prev_depth = current_depth;
+      if (flag && current_depth > 0){
+        for (let i = index-1; i >= 0; i--) {
+          current_depth = task_array[i].depth;
+
+          if (!task_array[i].isCompl && prev_depth === current_depth){
+            flag = false;
+            break;
+          }
+          else if (!task_array[i].isCompl && prev_depth > current_depth){
+            task_array[i].isCompl = true;
+          }
+
+          prev_depth = current_depth;
+
+          if (current_depth === 0){
+            flag = false;
+            break;
+          }
+        }
+      }
 
       const new_tasks =  [...task_array];
       set_tasks(new_tasks);
