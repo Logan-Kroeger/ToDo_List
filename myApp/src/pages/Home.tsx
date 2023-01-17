@@ -105,6 +105,8 @@ const Home: React.FC = () => {
         }
       }
 
+      // Complete respective parent items
+
       const new_tasks =  [...task_array];
       set_tasks(new_tasks);
     }
@@ -233,7 +235,7 @@ const Home: React.FC = () => {
       </IonHeader>
 
       <IonContent className="ion-padding">
-        <IonList>
+        <IonList lines='full'>
 
           {task_array.map((item, index) => (
             <IonItem key={index} style={{ paddingLeft: `${(item.depth)*30}px` }}>
