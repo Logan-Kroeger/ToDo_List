@@ -91,10 +91,17 @@ const Home: React.FC = () => {
   const completeItem = (event: any, index: number) => {
     const checked  = event.detail.checked;
     console.log(`Checkbox ${index} is ${checked ? 'checked' : 'not checked'}`);
+
+    if (checked){
+      task_array[index].isCompl = true;
+    }
+    else{
+      task_array[index].isCompl = false;
+    }
   }
 
   // Add a new item to the list
-  const addItem = (index: number) => {
+  const addSubItem = (index: number) => {
     console.log(`Add button clicked (index: ${index})`);
 
     addSubAlert({
@@ -219,7 +226,7 @@ const Home: React.FC = () => {
             <IonItem key={index} style={{ paddingLeft: `${(item.depth)*20}px` }}>
               <IonCheckbox slot="start" onIonChange={(event) => completeItem(event, index)}/>
               <IonLabel>{item.name}</IonLabel>
-              <IonButton color='primary' fill='clear' onClick={() => addItem(index)}>
+              <IonButton color='primary' fill='clear' onClick={() => addSubItem(index)}>
                 <IonIcon slot="icon-only" icon={add}></IonIcon>
               </IonButton>
               <IonButton color='secondary' fill='clear' onClick={() => editItem(index)}>
