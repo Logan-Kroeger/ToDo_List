@@ -74,8 +74,9 @@ const Home: React.FC = () => {
   };
 
   // Complete the item from the list
-  const completeItem = () => {
-    console.log("Checkbox clicked");
+  const completeItem = (event: any, index: number) => {
+    const checked  = event.detail.checked;
+    console.log(`Checkbox ${index} is ${checked ? 'checked' : 'not checked'}`);
   }
 
   // Add a new item to the list
@@ -123,7 +124,7 @@ const Home: React.FC = () => {
       <IonList>
         {myArray.map((item, index) => (
           <IonItem key={index} style={{ paddingLeft: `${(item.depth-1)*20}px` }}>
-            <IonCheckbox slot="start" onClick={() => completeItem()}/>
+            <IonCheckbox slot="start" onIonChange={(event) => completeItem(event, index)}/>
             <IonLabel>{item.name}</IonLabel>
             <IonButton color='primary' fill='clear' onClick={() => addItem()}>
               <IonIcon slot="icon-only" icon={add}></IonIcon>
