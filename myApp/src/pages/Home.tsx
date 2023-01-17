@@ -37,7 +37,11 @@ interface task {
 }
 
 // Array of all tasks
-let task_array: task[] = [];
+//let task_array: task[] = [];
+
+// Used for the deletion indexing
+let current_depth:number;
+let end_index:number;
 
 const Home: React.FC = () => {
 
@@ -50,12 +54,15 @@ const Home: React.FC = () => {
   // -------- Input --------
   const [newItem, setNewItem] = useState('');
 
+  // All task data with state
+  let [task_array, set_tasks] = useState<task[]>([]);
+
   // Update text input value
   const handleInputChange = (event: any) => {
     setNewItem(event.target.value);
   };
 
-  // Create the new item
+  // Create the new base item
   const handleButtonClick = () => {
 
     // Invalid input handler
@@ -138,8 +145,22 @@ const Home: React.FC = () => {
         {
           text: 'Confirm',
           handler: () => {
-            console.log("Action confirmed");
-            // Perform the action
+            
+            // Obtain the indexes for deletion to occur
+            current_depth = task_array[index].depth;
+            
+            for (let i = index+1; i < task_array.length; i++){
+              if (task_array[i].depth >= current_depth){
+                end_index = i;
+                break;
+              }
+            }
+
+            const new_tasks =  [...task_array];
+            new_tasks.splice(index, end_index-index);
+            set_tasks(new_tasks);
+            
+            console.log("Deletion confirmed");
           }
         }
       ]
