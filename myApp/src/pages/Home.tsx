@@ -43,11 +43,15 @@ interface task {
 let current_depth:number;
 let end_index:number;
 
+// Used for creating sub-tasks
+let new_depth:number;
+
 const Home: React.FC = () => {
 
   // -------- Alerts --------
   const [inputValue, setInputValue] = useState("");
   const [addAlert] = useIonAlert();
+  const [addSubAlert] = useIonAlert();
   const [editAlert] = useIonAlert();
   const [deleteAlert] = useIonAlert();
 
@@ -55,7 +59,7 @@ const Home: React.FC = () => {
   const [newItem, setNewItem] = useState('');
 
   // All task data with state
-  let [task_array, set_tasks] = useState<task[]>([]);
+  const [task_array, set_tasks] = useState<task[]>([]);
 
   // Update text input value
   const handleInputChange = (event: any) => {
@@ -63,7 +67,7 @@ const Home: React.FC = () => {
   };
 
   // Create the new base item
-  const handleButtonClick = () => {
+  const addBaseItem = () => {
 
     // Invalid input handler
     if (newItem === ''){
@@ -92,6 +96,35 @@ const Home: React.FC = () => {
   // Add a new item to the list
   const addItem = (index: number) => {
     console.log(`Add button clicked (index: ${index})`);
+
+    addSubAlert({
+      header: 'Enter the new sub-task name',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'secondary'
+        },
+        {
+          text: 'Ok',
+          handler: (data) => {
+            setInputValue(data.newData);
+            
+            // Add the new sub-task
+            new_depth = task_array[index].depth + 1;
+            const new_task = { name: data.newData, depth: new_depth, isCompl: false };
+            task_array.splice(index+1, 0, new_task);
+          }
+        }
+      ],
+      inputs: [
+        {
+          name: 'newData',
+          type: 'text',
+          placeholder: 'Sub-task name...'
+        }
+      ],
+    })
   }
 
   // Edit the name of the item on the list
@@ -159,7 +192,7 @@ const Home: React.FC = () => {
             const new_tasks =  [...task_array];
             new_tasks.splice(index, end_index-index);
             set_tasks(new_tasks);
-            
+
             console.log("Deletion confirmed");
           }
         }
@@ -176,7 +209,7 @@ const Home: React.FC = () => {
         </IonToolbar>
         <IonItem>
           <IonInput value={newItem} onIonChange={handleInputChange} placeholder="Task name"></IonInput>
-          <IonButton onClick={handleButtonClick}>Add item</IonButton>
+          <IonButton onClick={addBaseItem}>Add item</IonButton>
         </IonItem>
       </IonHeader>
 
