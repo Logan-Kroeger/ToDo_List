@@ -109,7 +109,7 @@ const Home: React.FC = () => {
           text: 'Ok',
           handler: (data) => {
             setInputValue(data.newData);
-            
+
             // Add the new sub-task
             new_depth = task_array[index].depth + 1;
             const new_task = { name: data.newData, depth: new_depth, isCompl: false };
@@ -183,7 +183,7 @@ const Home: React.FC = () => {
             current_depth = task_array[index].depth;
             
             for (let i = index+1; i < task_array.length; i++){
-              if (task_array[i].depth >= current_depth){
+              if (task_array[i].depth <= current_depth){
                 end_index = i;
                 break;
               }
