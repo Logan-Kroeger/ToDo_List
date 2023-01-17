@@ -28,6 +28,17 @@ import { useState } from 'react';
 import { useIonAlert } from '@ionic/react';
 import './Home.css';
 
+// Task object
+interface task {
+  name: string;
+  depth: number;
+  isValid: boolean;
+  parent?: task;
+}
+
+// Array of all tasks
+let task_array: task[] = [];
+
 const Home: React.FC = () => {
 
   // -------- Alerts --------
@@ -35,23 +46,8 @@ const Home: React.FC = () => {
   const [presentAlert] = useIonAlert();
 
   // -------- List items --------
-  const [items, setItems] = useState<string[]>([]);
+  //const [items, setItems] = useState<string[]>([]);
   const [newItem, setNewItem] = useState('');
-
-  interface MyObject {
-    name: string;
-    depth: number;
-    isValid: boolean;
-    parent?: MyObject;
-  }
-  
-  const myArray: MyObject[] = [];
-
-  myArray.push({ name: "Object 1", depth: 1, isValid: true });
-  myArray.push({ name: "Object 2", depth: 2, isValid: false });
-  myArray.push({ name: "Object 3", depth: 3, isValid: true });
-
-  myArray[1].parent = myArray[0]
 
   // Update text input value
   const handleInputChange = (event: any) => {
@@ -60,15 +56,21 @@ const Home: React.FC = () => {
 
   // Create the new item
   const handleButtonClick = () => {
+    
+    // Invalid input handler
     if (newItem === ''){
       presentAlert({
         header: 'Warning',
         message: 'Please enter a valid task name!',
         buttons: ['OK'],
       })
+      console.log(`Invalid task name`);
     }
+    // Append the new task to the list
     else{
-      setItems([...items, newItem]);
+      console.log(`Item has been added`);
+      task_array.push({ name: newItem, depth: 0, isValid: false });
+      console.log(task_array[task_array.length-1]);
       setNewItem('');
     }
   };
@@ -80,18 +82,18 @@ const Home: React.FC = () => {
   }
 
   // Add a new item to the list
-  const addItem = () => {
-    console.log("Add button clicked");
+  const addItem = (index: number) => {
+    console.log(`Add button clicked (index: ${index})`);
   }
 
   // Edit the name of the item on the list
-  const editItem = () => {
-    console.log("Edit button clicked");
+  const editItem = (index: number) => {
+    console.log(`Edit button clicked (index: ${index})`);
   }
 
   // Alert for deleting item on the list
-  const deleteItem = () => {
-    console.log("Delete button clicked");
+  const deleteItem = (index: number) => {
+    console.log(`Delete button clicked (index: ${index})`);
     setShowAlert(true);
   }
 
@@ -105,7 +107,6 @@ const Home: React.FC = () => {
     console.log('Confirmed!');
     setShowAlert(false);
   };
-
 
   return (
     <IonPage>
@@ -122,17 +123,17 @@ const Home: React.FC = () => {
     
 
       <IonList>
-        {myArray.map((item, index) => (
-          <IonItem key={index} style={{ paddingLeft: `${(item.depth-1)*20}px` }}>
+        {task_array.map((item, index) => (
+          <IonItem key={index} style={{ paddingLeft: `${(item.depth)*20}px` }}>
             <IonCheckbox slot="start" onIonChange={(event) => completeItem(event, index)}/>
             <IonLabel>{item.name}</IonLabel>
-            <IonButton color='primary' fill='clear' onClick={() => addItem()}>
+            <IonButton color='primary' fill='clear' onClick={() => addItem(index)}>
               <IonIcon slot="icon-only" icon={add}></IonIcon>
             </IonButton>
-            <IonButton color='secondary' fill='clear' onClick={() => editItem()}>
+            <IonButton color='secondary' fill='clear' onClick={() => editItem(index)}>
               <IonIcon slot="icon-only" icon={pencil}></IonIcon>
             </IonButton>
-            <IonButton color='danger' fill='clear' onClick={() => deleteItem()}>
+            <IonButton color='danger' fill='clear' onClick={() => deleteItem(index)}>
               <IonIcon slot="icon-only" icon={trash}></IonIcon>
             </IonButton>
           </IonItem>
