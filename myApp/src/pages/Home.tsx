@@ -7,7 +7,7 @@ import {
   IonToolbar, 
   IonList,
   IonInput,
-  IonProgressBar, 
+  //IonProgressBar, 
   IonItem, 
   IonLabel, 
   IonCheckbox, 
@@ -38,6 +38,21 @@ const Home: React.FC = () => {
   const [items, setItems] = useState<string[]>([]);
   const [newItem, setNewItem] = useState('');
 
+  interface MyObject {
+    name: string;
+    depth: number;
+    isValid: boolean;
+    parent?: MyObject;
+  }
+  
+  const myArray: MyObject[] = [];
+
+  myArray.push({ name: "Object 1", depth: 1, isValid: true });
+  myArray.push({ name: "Object 2", depth: 2, isValid: false });
+  myArray.push({ name: "Object 3", depth: 3, isValid: true });
+
+  myArray[1].parent = myArray[0]
+
   // Update text input value
   const handleInputChange = (event: any) => {
     setNewItem(event.target.value);
@@ -45,7 +60,7 @@ const Home: React.FC = () => {
 
   // Create the new item
   const handleButtonClick = () => {
-    if (newItem == ''){
+    if (newItem === ''){
       presentAlert({
         header: 'Warning',
         message: 'Please enter a valid task name!',
@@ -106,10 +121,10 @@ const Home: React.FC = () => {
     
 
       <IonList>
-        {items.map((item, index) => (
+        {myArray.map((item, index) => (
           <IonItem key={index}>
             <IonCheckbox slot="start" onClick={() => completeItem()}/>
-            <IonLabel>{item}</IonLabel>
+            <IonLabel>{item.name}</IonLabel>
             <IonButton color='primary' fill='clear' onClick={() => addItem()}>
               <IonIcon slot="icon-only" icon={add}></IonIcon>
             </IonButton>
