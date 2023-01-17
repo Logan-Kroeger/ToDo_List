@@ -7,7 +7,7 @@ import {
   IonToolbar, 
   IonList,
   IonInput,
-  //IonProgressBar, 
+  IonProgressBar, 
   IonItem, 
   IonLabel, 
   IonCheckbox, 
@@ -54,8 +54,24 @@ const Home: React.FC = () => {
   // -------- Input --------
   const [newItem, setNewItem] = useState('');
 
-  // All task data with state
-  const [task_array, set_tasks] = useState<task[]>([]);
+  // ---- Progress Bar -----
+  let [completion, setCompletion] = useState(0);
+
+  // ------ Task Data ------
+  let [task_array, set_tasks] = useState<task[]>([]);
+
+  // Update the progress bar
+  const updateBar = () => {
+
+    let count = 0;
+    const len = task_array.length
+    for (let i = 0; i < task_array.length; i++) {
+      if (task_array[i].isCompl){
+        count++;
+      }
+    }
+    setCompletion(count/len);
+  }
 
   // Update text input value
   const handleInputChange = (event: any) => {
@@ -134,8 +150,9 @@ const Home: React.FC = () => {
 
             // Add the new sub-task
             new_depth = task_array[index].depth + 1;
-            const new_task = { name: data.newData, depth: new_depth, isCompl: false };
-            task_array.splice(index+1, 0, new_task);
+            const new_tasks =  [...task_array];
+            new_tasks.splice(index+1, 0, { name: data.newData, depth: new_depth, isCompl: false });
+            set_tasks(new_tasks);
           }
         }
       ],
@@ -202,6 +219,7 @@ const Home: React.FC = () => {
           handler: () => {
             
             // Obtain the indexes for deletion to occur
+            end_index = -1;
             current_depth = task_array[index].depth;
             
             for (let i = index+1; i < task_array.length; i++){
@@ -209,6 +227,10 @@ const Home: React.FC = () => {
                 end_index = i;
                 break;
               }
+            }
+
+            if (end_index === -1){
+              end_index = task_array.length;
             }
 
             const new_tasks =  [...task_array];
@@ -222,6 +244,7 @@ const Home: React.FC = () => {
     });
   }
 
+
   return (
     <IonPage>
       <IonHeader>
@@ -231,7 +254,9 @@ const Home: React.FC = () => {
         <IonItem>
           <IonInput value={newItem} onIonChange={handleInputChange} placeholder="Task name"></IonInput>
           <IonButton onClick={addBaseItem}>Add item</IonButton>
+          <IonButton color={'success'} onClick={updateBar}>Update Progress</IonButton>
         </IonItem>
+        <IonProgressBar value={completion} color={`success`}/>
       </IonHeader>
 
       <IonContent className="ion-padding">
