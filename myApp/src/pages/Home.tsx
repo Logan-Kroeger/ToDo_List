@@ -13,7 +13,6 @@ import {
   IonCheckbox, 
   IonButton, 
   IonIcon,
-  IonAlert
 } from '@ionic/react';
 
 // Ion icon imports
@@ -36,10 +35,7 @@ interface task {
   parent?: task;
 }
 
-// Array of all tasks
-//let task_array: task[] = [];
-
-// Used for the deletion indexing
+// Used for the deletion and completion indexing
 let current_depth:number;
 let end_index:number;
 
@@ -87,13 +83,30 @@ const Home: React.FC = () => {
     }
   };
 
-  // Complete the item from the list
+  // Complete an item from the list
   const completeItem = (event: any, index: number) => {
     const checked  = event.detail.checked;
-    console.log(`Checkbox ${index} is ${checked ? 'checked' : 'not checked'}`);
+    console.log(`${task_array[index].name} is ${checked ? 'complete' : 'not complete'}`);
 
     if (checked){
+
       task_array[index].isCompl = true;
+      current_depth = task_array[index].depth
+      
+      // Complete all sub-items
+      for (let i = index+1; i < task_array.length; i++){
+
+        if (task_array[i].depth > current_depth){
+          task_array[i].isCompl = true;
+          console.log(`${task_array[i].name} is ${checked ? 'complete' : 'not complete'}`);
+        }
+        else{
+          break;
+        }
+      }
+
+      const new_tasks =  [...task_array];
+      set_tasks(new_tasks);
     }
     else{
       task_array[index].isCompl = false;
@@ -209,7 +222,6 @@ const Home: React.FC = () => {
 
   return (
     <IonPage>
-
       <IonHeader>
         <IonToolbar>
           <IonTitle className='custom_title'>TODO List</IonTitle>
@@ -222,9 +234,10 @@ const Home: React.FC = () => {
 
       <IonContent className="ion-padding">
         <IonList>
+
           {task_array.map((item, index) => (
-            <IonItem key={index} style={{ paddingLeft: `${(item.depth)*20}px` }}>
-              <IonCheckbox slot="start" onIonChange={(event) => completeItem(event, index)}/>
+            <IonItem key={index} style={{ paddingLeft: `${(item.depth)*30}px` }}>
+              <IonCheckbox slot="start" checked={item.isCompl} onIonChange={(event) => completeItem(event, index)}/>
               <IonLabel>{item.name}</IonLabel>
               <IonButton color='primary' fill='clear' onClick={() => addSubItem(index)}>
                 <IonIcon slot="icon-only" icon={add}></IonIcon>
@@ -237,6 +250,7 @@ const Home: React.FC = () => {
               </IonButton>
             </IonItem>
           ))}
+
         </IonList>
       </IonContent>
     </IonPage>
