@@ -32,7 +32,7 @@ import './Home.css';
 interface task {
   name: string;
   depth: number;
-  isValid: boolean;
+  isCompl: boolean;
   parent?: task;
 }
 
@@ -42,11 +42,12 @@ let task_array: task[] = [];
 const Home: React.FC = () => {
 
   // -------- Alerts --------
-  const [showAlert, setShowAlert] = useState(false);
-  const [presentAlert] = useIonAlert();
+  const [inputValue, setInputValue] = useState("");
+  const [addAlert] = useIonAlert();
+  const [editAlert] = useIonAlert();
+  const [deleteAlert] = useIonAlert();
 
-  // -------- List items --------
-  //const [items, setItems] = useState<string[]>([]);
+  // -------- Input --------
   const [newItem, setNewItem] = useState('');
 
   // Update text input value
@@ -56,12 +57,12 @@ const Home: React.FC = () => {
 
   // Create the new item
   const handleButtonClick = () => {
-    
+
     // Invalid input handler
     if (newItem === ''){
-      presentAlert({
+      addAlert({
         header: 'Warning',
-        message: 'Please enter a valid task name!',
+        message: 'Enter a valid task name!',
         buttons: ['OK'],
       })
       console.log(`Invalid task name`);
@@ -69,7 +70,7 @@ const Home: React.FC = () => {
     // Append the new task to the list
     else{
       console.log(`Item has been added`);
-      task_array.push({ name: newItem, depth: 0, isValid: false });
+      task_array.push({ name: newItem, depth: 0, isCompl: false });
       console.log(task_array[task_array.length-1]);
       setNewItem('');
     }
@@ -89,27 +90,65 @@ const Home: React.FC = () => {
   // Edit the name of the item on the list
   const editItem = (index: number) => {
     console.log(`Edit button clicked (index: ${index})`);
+
+    // Obtain new name from user to update using an alert
+    editAlert({
+      header: 'Enter the updated task name',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'secondary'
+        },
+        {
+          text: 'Ok',
+          handler: (data) => {
+            setInputValue(data.newData);
+            // Update the name to the new input value
+            task_array[index].name = data.newData;
+            console.log("New input value:", task_array[index].name);
+          }
+        }
+      ],
+      inputs: [
+        {
+          name: 'newData',
+          type: 'text',
+          value: task_array[index].name,
+          placeholder: 'Enter new data'
+        }
+      ],
+    })
   }
 
   // Alert for deleting item on the list
   const deleteItem = (index: number) => {
     console.log(`Delete button clicked (index: ${index})`);
-    setShowAlert(true);
+
+    // Delete confirmation alert
+    deleteAlert({
+      header: 'Delete Task',
+      message: 'Are you sure you want to perform this action?',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'secondary'
+        },
+        {
+          text: 'Confirm',
+          handler: () => {
+            console.log("Action confirmed");
+            // Perform the action
+          }
+        }
+      ]
+    });
   }
-
-  // Cancel the delete
-  const handleCancel = () => {
-    setShowAlert(false);
-  };
-
-  // Confirm the delete
-  const handleConfirm = () => {
-    console.log('Confirmed!');
-    setShowAlert(false);
-  };
 
   return (
     <IonPage>
+
       <IonHeader>
         <IonToolbar>
           <IonTitle className='custom_title'>TODO List</IonTitle>
@@ -119,47 +158,25 @@ const Home: React.FC = () => {
           <IonButton onClick={handleButtonClick}>Add item</IonButton>
         </IonItem>
       </IonHeader>
+
       <IonContent className="ion-padding">
-    
-
-      <IonList>
-        {task_array.map((item, index) => (
-          <IonItem key={index} style={{ paddingLeft: `${(item.depth)*20}px` }}>
-            <IonCheckbox slot="start" onIonChange={(event) => completeItem(event, index)}/>
-            <IonLabel>{item.name}</IonLabel>
-            <IonButton color='primary' fill='clear' onClick={() => addItem(index)}>
-              <IonIcon slot="icon-only" icon={add}></IonIcon>
-            </IonButton>
-            <IonButton color='secondary' fill='clear' onClick={() => editItem(index)}>
-              <IonIcon slot="icon-only" icon={pencil}></IonIcon>
-            </IonButton>
-            <IonButton color='danger' fill='clear' onClick={() => deleteItem(index)}>
-              <IonIcon slot="icon-only" icon={trash}></IonIcon>
-            </IonButton>
-          </IonItem>
-        ))}
-      </IonList>
-
-
-      <IonAlert
-        isOpen={showAlert}
-        onDidDismiss={handleCancel}
-        header={'Confirm Action'}
-        message={'Are you sure you want to delete this item?'}
-        buttons={[
-          {
-            text: 'Cancel',
-            role: 'cancel',
-            cssClass: 'secondary',
-            handler: handleCancel,
-          },
-          {
-            text: 'Confirm',
-            handler: handleConfirm
-          }
-        ]}
-      />
-
+        <IonList>
+          {task_array.map((item, index) => (
+            <IonItem key={index} style={{ paddingLeft: `${(item.depth)*20}px` }}>
+              <IonCheckbox slot="start" onIonChange={(event) => completeItem(event, index)}/>
+              <IonLabel>{item.name}</IonLabel>
+              <IonButton color='primary' fill='clear' onClick={() => addItem(index)}>
+                <IonIcon slot="icon-only" icon={add}></IonIcon>
+              </IonButton>
+              <IonButton color='secondary' fill='clear' onClick={() => editItem(index)}>
+                <IonIcon slot="icon-only" icon={pencil}></IonIcon>
+              </IonButton>
+              <IonButton color='danger' fill='clear' onClick={() => deleteItem(index)}>
+                <IonIcon slot="icon-only" icon={trash}></IonIcon>
+              </IonButton>
+            </IonItem>
+          ))}
+        </IonList>
       </IonContent>
     </IonPage>
   );
